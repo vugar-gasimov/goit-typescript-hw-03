@@ -1,34 +1,18 @@
-class Key {
-  private keyId: number;
-
-  constructor(keyId: number) {
-    if (typeof keyId !== "number" || isNaN(keyId)) {
-      throw new Error("Invalid key ID. Please provide a valid number.");
-    }
-    this.keyId = keyId;
-  }
-
-  getKeyId() {
-    return this.keyId;
-  }
-
-  checkCompatibility(otherKey: Key) {
-    return this.keyId === otherKey.getKeyId();
+class House {
+  door: string;
+  key: Key;
+  constructor(door: string, key: Key) {
+    this.door = door;
+    this.key = key;
   }
 }
-
-class MyHouse {
-  private doorKey: Key;
-
-  constructor(key: Key) {
-    if (!(key instanceof Key)) {
-      throw new Error("Invalid key object.");
-    }
-    this.doorKey = key;
+class MyHouse extends House {
+  constructor(door: string, key: Key) {
+    super(door, key);
   }
 
   openDoor(personKey: Key) {
-    if (this.doorKey.checkCompatibility(personKey)) {
+    if (this.key === personKey) {
       console.log("Door is opening");
     } else {
       console.log("False key");
@@ -36,26 +20,34 @@ class MyHouse {
   }
 
   comeIn(person: Person) {
-    if (this.isAuthorised(person)) {
+    if (this.key === person.getKey()) {
       console.log(`${person.getName()} enters the house.`);
     } else {
       console.log(`${person.getName()} can't enter the house.`);
     }
   }
+}
 
-  private isAuthorised(person: Person): boolean {
-    return this.doorKey.checkCompatibility(person.getKey());
+class Key {
+  private keyId: number = Math.random();
+
+  getKeyId() {
+    return this.keyId;
   }
+
+  checkCompatibility(otherKey: Key) {}
 }
 
 class Person {
   private key: Key;
+  private name: string;
 
-  constructor(key: Key) {
+  constructor(key: Key, name: string) {
     if (!(key instanceof Key)) {
       throw new Error("Invalid key object for person.");
     }
     this.key = key;
+    this.name = name;
   }
 
   getKey() {
@@ -63,15 +55,15 @@ class Person {
   }
 
   getName() {
-    return "Vugar Gasimov";
+    return this.name;
   }
 }
 
-const key = new Key(123);
+const key = new Key();
 
-const house = new MyHouse(key);
+const house = new MyHouse("front door", key);
 
-const person = new Person(key);
+const person = new Person(key, "Vugar");
 
 house.openDoor(person.getKey());
 
