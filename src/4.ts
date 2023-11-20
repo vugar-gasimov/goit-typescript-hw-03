@@ -1,72 +1,58 @@
-class House {
-  door: string;
-  key: Key;
-  constructor(door: string, key: Key) {
-    this.door = door;
-    this.key = key;
-  }
-}
-class MyHouse extends House {
-  constructor(door: string, key: Key) {
-    super(door, key);
-  }
-
-  openDoor(personKey: Key) {
-    if (this.key === personKey) {
-      console.log("Door is opening");
-    } else {
-      console.log("False key");
-    }
-  }
-
-  comeIn(person: Person) {
-    if (this.key === person.getKey()) {
-      console.log(`${person.getName()} enters the house.`);
-    } else {
-      console.log(`${person.getName()} can't enter the house.`);
-    }
-  }
-}
-
 class Key {
-  private keyId: number = Math.random();
+  private signature: number;
 
-  getKeyId() {
-    return this.keyId;
+  constructor() {
+    this.signature = Math.random();
   }
 
-  checkCompatibility(otherKey: Key) {}
+  getSignature(): number {
+    return this.signature;
+  }
+}
+
+abstract class House {
+  public door: boolean = false;
+  protected key: Key;
+  public tenants: Person[];
+
+  constructor(key: Key) {
+    this.key = key;
+    this.door = false;
+    this.tenants = [];
+  }
+
+  abstract openDoor(key: Key): void;
+
+  comeIn(person: Person): void {
+    if (this.door) {
+      this.tenants.push(person);
+    }
+  }
+}
+
+class MyHouse extends House {
+  openDoor(key: Key): void {
+    if (this.key.getSignature() === key.getSignature()) {
+      this.door = true;
+    }
+  }
 }
 
 class Person {
-  private key: Key;
-  private name: string;
-
-  constructor(key: Key, name: string) {
-    if (!(key instanceof Key)) {
-      throw new Error("Invalid key object for person.");
-    }
+  constructor(private key: Key) {
     this.key = key;
-    this.name = name;
   }
 
-  getKey() {
+  getKey(): Key {
     return this.key;
-  }
-
-  getName() {
-    return this.name;
   }
 }
 
 const key = new Key();
-
-const house = new MyHouse("front door", key);
-
-const person = new Person(key, "Vugar");
+const house = new MyHouse(key);
+const person = new Person(key);
 
 house.openDoor(person.getKey());
-
 house.comeIn(person);
 
 export {};
